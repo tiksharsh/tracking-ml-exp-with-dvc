@@ -17,7 +17,7 @@ def get_data(config_path):
     data_path = config["data_source"]["s3_source"]
     df = pd.read_csv(data_path, sep=',', encoding="utf-8")
     df = pd.get_dummies(df, columns=['famhist'], drop_first= True)
-    df = df.drop('sbp', axis=1, inplace=True)
+    df.drop('sbp', axis=1, inplace=True)
     return df
 
 if __name__ == "__main__":
