@@ -1,10 +1,15 @@
 # split the raw data 
 ## save it in data/processed folder
 import os
+import sys
 import pandas as pd
 import argparse
 from sklearn.model_selection import train_test_split
 from get_data import read_params
+
+sys.path.append("src")
+from logger import logging
+from exception import CustomException
 
 def split_and_saved_data(config_path):
     config = read_params(config_path)
@@ -23,6 +28,8 @@ def split_and_saved_data(config_path):
     
     train.to_csv(train_data_path, sep= ',', index = False, encoding = "utf-8")
     test.to_csv(test_data_path, sep= ',', index = False, encoding = 'utf-8')
+    logging.info('-'*80)
+    logging.info(f"test and train input csv files created in data/processed folder")
 
 
 
