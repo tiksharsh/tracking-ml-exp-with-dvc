@@ -1,6 +1,8 @@
 ## read params
 ## process
 ### return dataframe
+# https://www.analyticsvidhya.com/blog/2021/06/mlops-tracking-ml-experiments-with-data-version-control/
+# https://github.com/amitvkulkarni/Versioning-ML-Models-datasets-With-DVC/blob/main/src/get_data.py
 
 import os
 import yaml
