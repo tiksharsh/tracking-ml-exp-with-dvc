@@ -1,0 +1,49 @@
+stages:
+  load_data:
+    cmd: python src/components/load_data.py --config=params.yaml
+    deps:
+    - src/components/get_data.py
+    - src/components/load_data.py
+    - data_given/SAHeart.csv
+    outs:
+    - data/raw/SAHeart.csv
+
+  split_data:
+    cmd: python src/components/split_data.py --config=params.yaml
+    deps:
+    - src/components/split_data.py
+    - data/raw/SAHeart.csv
+    outs:
+    - data/processed/train_SAHeart.csv
+    - data/processed/test_SAHeart.csv 
+
+  train_and_evaluate:
+    cmd: [python src/components/train_and_evaluate.py --config=params.yaml, dvc plots show]
+    
+    deps:
+    - data/processed/train_SAHeart.csv
+    - data/processed/test_SAHeart.csv 
+    - src/components/train_and_evaluate.py
+    
+    metrics:
+    - report/scores.json:
+        cache: false
+
+    plots:
+      
+    - report/prc.json:
+        cache: false
+        x: recall
+        y: precision
+    - report/roc.json:
+        cache: false
+        x: fpr
+        y: tpr
+    
+        
+
+    outs:
+    - saved_models/model.joblib
+    - result/cm.csv
+
+#
