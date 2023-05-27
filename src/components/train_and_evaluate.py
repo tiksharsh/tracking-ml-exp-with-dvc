@@ -136,8 +136,8 @@ def train_and_evaluate(config_path):
     #     df1 = pd.DataFrame(predicted_val, columns = ['Predicted'])
     #     df_cm = pd.concat([test_y, df1], axis=1)
     #     # print(df_cm)
-        
-    df_cm.to_csv('cm.csv', index = False)
+    result_cross_check = config["result_dir"]['result_cross_check']
+    df_cm.to_csv(result_cross_check, index = False)
 
     # with open(auc_file, "w") as fd:
     #     json.dump(df_cm.to_json(), fd, indent=4, cls=NumpyEncoder)

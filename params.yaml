@@ -16,6 +16,8 @@ split_data:
   test_size: 0.35
 
 model_dir: saved_models
+result_dir: 
+  result_cross_check: result/cm.csv
 
 reports:
   scores: report/scores.json
