@@ -65,23 +65,23 @@ def train_and_evaluate(config_path):
 
     # Encode the string labels to numeric values
     label_encoder = LabelEncoder()
-    test_y = label_encoder.fit_transform(test_y)
-    predicted_val = label_encoder.transform(predicted_val)
+    test_y_lr = label_encoder.fit_transform(test_y)
+    predicted_val_lr = label_encoder.transform(predicted_val)
 
     # Calculate precision and recall
 
     #-------------------------------------------------------------------------------------------------------------------------
     
-    precision, recall, prc_thresholds = metrics.precision_recall_curve(test_y, predicted_val)
+    precision, recall, prc_thresholds = metrics.precision_recall_curve(test_y_lr, predicted_val_lr)
     logging.info('-'*80)
     logging.info(f"precision value: {precision}")
     logging.info('-'*80)
     logging.info(f"recall value: {recall}")
     
-    fpr, tpr, roc_thresholds = metrics.roc_curve(test_y, predicted_val)
+    fpr, tpr, roc_thresholds = metrics.roc_curve(test_y_lr, predicted_val_lr)
 
-    avg_prec = metrics.average_precision_score(test_y, predicted_val)
-    roc_auc = metrics.roc_auc_score(test_y, predicted_val)
+    avg_prec = metrics.average_precision_score(test_y_lr, predicted_val_lr)
+    roc_auc = metrics.roc_auc_score(test_y_lr, predicted_val_lr)
 
     scores_file = config["reports"]["scores"]
     prc_file = config["reports"]["prc"]
@@ -119,17 +119,17 @@ def train_and_evaluate(config_path):
     #------------------------------------------------------------------------------------------------------------------------
 
     # Print classification report
-    print(classification_report(test_y, predicted_val))
+    print(classification_report(test_y_lr, predicted_val_lr))
 
     # Confusion Matrix and plot
-    cm = confusion_matrix(test_y, predicted_val)
+    cm = confusion_matrix(test_y_lr, predicted_val_lr)
     print(cm)
 
         
-    df1 = pd.DataFrame(predicted_val, columns = ['Predicted'])
-    test_y = pd.Series(test_y, name='True')
+    df1 = pd.DataFrame(predicted_val_lr, columns = ['Predicted'])
+    test_y_lr = pd.Series(test_y_lr, name='True')
 
-    df_cm = pd.concat([test_y.reset_index(drop=True), df1], axis=1)
+    df_cm = pd.concat([test_y_lr.reset_index(drop=True), df1], axis=1)
     print(df_cm)
     
     # with open(cm_file, "w") as fd:
@@ -142,15 +142,15 @@ def train_and_evaluate(config_path):
     # with open(auc_file, "w") as fd:
     #     json.dump(df_cm.to_json(), fd, indent=4, cls=NumpyEncoder)
 
-    roc_auc = roc_auc_score(test_y, model.predict_proba(test_x)[:, 1])
-    print('ROC_AUC:{0:0.2f}'.format(roc_auc))
+    roc_auc = roc_auc_score(test_y_lr, model.predict_proba(test_x)[:, 1])
+    logging.info('ROC_AUC:{0:0.2f}'.format(roc_auc))
 
-    Logistic_Accuracy = accuracy_score(test_y, predicted_val)
-    print('Logistic Regression Model Accuracy:{0:0.2f}'.format(Logistic_Accuracy))
+    Logistic_Accuracy = accuracy_score(test_y_lr, predicted_val_lr)
+    logging.info('Logistic Regression Model Accuracy:{0:0.2f}'.format(Logistic_Accuracy))
 
     # Average precision score
-    average_precision = average_precision_score(test_y, predicted_val)
-    print('Average precision-recall score: {0:0.2f}'.format(average_precision))
+    average_precision = average_precision_score(test_y_lr, predicted_val_lr)
+    logging.info('Average precision-recall score: {0:0.2f}'.format(average_precision))
 
 
     # metrics.plot_roc_curve(model, test_x, test_y) 
@@ -158,19 +158,19 @@ def train_and_evaluate(config_path):
 
     #---------------- Random Forest -------------------------------
 
-    # model_rf = RandomForestClassifier(n_estimators = 50)  
+    model_rf = RandomForestClassifier(n_estimators = 50)  
     
-    # model_rf.fit(train_x, train_y)
+    model_rf.fit(train_x, train_y)
     
-    # # performing predictions on the test dataset
-    # pred_rf = model_rf.predict(test_x)
+    # performing predictions on the test dataset
+    pred_rf = model_rf.predict(test_x)
     
-    # # metrics are used to find accuracy or error
+    # metrics are used to find accuracy or error
         
     
-    # # using metrics module for accuracy calculation
-    # RF_Accuracy = metrics.accuracy_score(test_y, pred_rf)
-    # print("Random Forest Accuracy: ", RF_Accuracy)
+    # using metrics module for accuracy calculation
+    RF_Accuracy = metrics.accuracy_score(test_y, pred_rf)
+    print("Random Forest Accuracy: ", RF_Accuracy)
 
     #---------------------------------------------------------------------
 
@@ -181,10 +181,11 @@ def train_and_evaluate(config_path):
             "train_score": train_score,
             "test_score": test_score,
             "roc_auc": roc_auc,
-            #"Precision": precision,
-            #"Recall": recall,            "Average precision": average_precision,
-            "Logistic Accuracy": Logistic_Accuracy
-            # "Random Forest Accuracy": RF_Accuracy                                 
+            "Precision": precision.tolist(),
+            "Recall": recall.tolist(),      
+            "Average precision": average_precision,
+            "Logistic Accuracy": Logistic_Accuracy,
+            "Random Forest Accuracy": RF_Accuracy                                 
             
         }
         json.dump(scores, f, indent=4)
